@@ -136,7 +136,9 @@ export default {
       : false;
 
     if (!recipient || (signatureRequired && !signedCorrectly)) {
-      message.setReject("Unrecognised campaign address");
+      if (String(env.INVALID_RECIPIENT_ACTION) === "hard_bounce") {
+        message.setReject("Invalid recipient address");
+      }
       return;
     }
 

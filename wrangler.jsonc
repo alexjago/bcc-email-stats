@@ -4,7 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-10-16",
   "vars": {
-    "REQUIRE_RECIPIENT_SIGNATURE": "false"
+    "REQUIRE_RECIPIENT_SIGNATURE": "false",
+    // "blackhole" silently discards malformed or invalidly-signed recipients.
+    // Set to "hard_bounce" to return a permanent SMTP error instead.
+    "INVALID_RECIPIENT_ACTION": "blackhole"
   },
   "observability": {
     "enabled": true,

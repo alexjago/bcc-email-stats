@@ -33,7 +33,12 @@ When enabled, the HMAC is base64url-encoded HMAC-SHA-256 over:
 
 ## Set up
 
-1. Install packages: `npm install`.
+1. Install packages and activate the repository hook:
+
+   ```sh
+   npm install
+   npm run hooks:install
+   ```
 2. Create D1: `npm run d1:create`. Copy the printed `database_id` into
    `wrangler.jsonc`.
 3. Replace `stats.example.org` in `wrangler.jsonc` with the Cloudflare-managed
@@ -47,20 +52,31 @@ When enabled, the HMAC is base64url-encoded HMAC-SHA-256 over:
    npx wrangler secret put RECIPIENT_HMAC_SECRET
    ```
 
-6. To require signed recipient tokens, add this non-secret setting to
-   `wrangler.jsonc`:
+6. Configure signed recipients and invalid-address handling in `wrangler.jsonc`:
 
    ```json
-   "vars": { "REQUIRE_RECIPIENT_SIGNATURE": "true" }
+   "vars": {
+     "REQUIRE_RECIPIENT_SIGNATURE": "true",
+     "INVALID_RECIPIENT_ACTION": "blackhole"
+   }
    ```
 
-7. Generate types and deploy:
+   `blackhole` is the default: malformed addresses and invalid HMACs are
+   accepted then discarded, with no D1 event or Worker log. Set
+   `INVALID_RECIPIENT_ACTION` to `hard_bounce` to instead return a permanent
+   SMTP error. Neither mode checks a preloaded campaign list; valid campaign
+   IDs are created on first use.
+
+7. Validate and deploy:
 
    ```sh
-   npm run cf-types
-   npm run check
+   npm run validate
    npm run deploy
    ```
+
+`npm run validate` is also run by the pre-commit hook. It regenerates Worker
+types, type-checks, applies pending local D1 migrations, and verifies that the
+Worker bundles without publishing it.
 
 Cloudflare must have Email Routing enabled for the destination domain. A BCC
 address needs only to be syntactically valid; the Worker processes the envelope

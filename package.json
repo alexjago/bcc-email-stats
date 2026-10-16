@@ -6,6 +6,8 @@
   "scripts": {
     "cf-types": "wrangler types",
     "check": "tsc --noEmit",
+    "validate": "npm run cf-types && npm run check && npm run d1:migrate:local && wrangler deploy --dry-run",
+    "hooks:install": "git config core.hooksPath .githooks",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "d1:create": "wrangler d1 create bcc-email-stats",
