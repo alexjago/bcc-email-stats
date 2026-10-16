@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "bcc-email-stats",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-16",
+  "vars": {
+    "REQUIRE_RECIPIENT_SIGNATURE": "false"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  // Replace with the D1 database ID printed by `npm run d1:create`.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bcc-email-stats",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Replace `stats.example.org` with the domain that receives BCC addresses.
+  // Wrangler will manage the Email Routing catch-all for this Worker.
+  "addresses": ["*@stats.example.org"]
+}
