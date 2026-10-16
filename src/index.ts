@@ -46,7 +46,10 @@ async function sha256(value: string): Promise<string> {
 }
 
 function parseRecipient(address: string): ParsedRecipient | null {
-  const localPart = address.trim().toLowerCase().split("@")[0];
+  // The signature is base64url and therefore case-sensitive. The address
+  // grammar below enforces lower-case campaign IDs and tokens without
+  // modifying the supplied signature.
+  const localPart = address.trim().split("@")[0];
   if (!localPart) return null;
 
   // Campaign IDs intentionally exclude hyphens so the first hyphen stays an
