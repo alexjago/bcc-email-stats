@@ -8,8 +8,8 @@ type EventRow = {
   campaign_id: string;
   total: number;
   unique_recipients: number;
-  first_received_at: number;
-  last_received_at: number;
+  first_received_at: number | null;
+  last_received_at: number | null;
 };
 
 const encoder = new TextEncoder();
@@ -99,15 +99,16 @@ async function handleStats(request: Request, env: Env, pathname: string): Promis
 
   const campaignMatch = /^\/api\/campaigns\/([a-z0-9_]{1,64})$/.exec(pathname);
   if (campaignMatch) {
+    const campaignId = campaignMatch[1];
     const row = await env.DB.prepare(
-      `SELECT campaign_id,
+      `SELECT ? AS campaign_id,
               COUNT(*) AS total,
               COUNT(DISTINCT token_fingerprint) AS unique_recipients,
               MIN(received_at) AS first_received_at,
               MAX(received_at) AS last_received_at
        FROM email_events WHERE campaign_id = ?`,
-    ).bind(campaignMatch[1]).first<EventRow>();
-    return json(row ?? { campaign_id: campaignMatch[1], total: 0, unique_recipients: 0, first_received_at: null, last_received_at: null });
+    ).bind(campaignId, campaignId).first<EventRow>();
+    return json(row ?? { campaign_id: campaignId, total: 0, unique_recipients: 0, first_received_at: null, last_received_at: null });
   }
 
   if (pathname === "/api/campaigns") {
